@@ -1,0 +1,90 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" standardController="Merchandise__c" extensions="MobileInventoryExtension" recordsetVar="products" >
+<apex:stylesheet value="https://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+<apex:includeScript value="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.2.min.js"/>
+<apex:includeScript value="https://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.0/jquery.mobile-1.1.0.min.js"/>
+   <h1>Mobile Inventory</h1>
+   <head>
+   <title>Mobile Inventory</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+   <script>
+      var j$ = jQuery.noConflict();
+      var dataChanged = false;
+      
+      j$(document).ready(function() {
+         j$(".updateButton").click(function() {
+            var id = j$(this).attr('data-id');
+            var inventory = parseInt(j$("#quantity"+id).val());
+            j$.mobile.showPageLoadingMsg();
+            MobileInventoryExtension.updateMerchandiseItem(id,inventory,handleUpdate);
+      });
+});
+
+      function handleUpdate(result,event) {
+         alert(result);
+         if(result == 'Item Updated') { dataChanged = true; }
+         j$.mobile.hidePageLoadingMsg();
+      }
+   </script>
+</head>
+   <body>
+   <!-- Main page, to display list of Merchandise once app starts -->
+   <div data-role="page" data-theme="b" id="mainpage"> 
+      <!-- page header -->
+      <div  data-role="header">
+         <!-- button for logging out -->
+         <a href='#' id="link_logout" data-role="button" data-icon='delete'>
+            Log Out
+         </a>
+         <!-- page title -->
+         <h2>List</h2>
+      </div> 
+      <!-- page content -->
+      <div id="#content" data-role="content">
+         <!-- page title -->
+         <h2>Mobile Inventory</h2> 
+         <!-- list of merchandise, links to detail pages -->
+         <div id="div_merchandise_list">
+            <ul data-inset="true" data-role="listview" data-theme="a" data-dividertheme="a"> 
+            <apex:repeat value="{!products}" var="product">
+   <li>
+      <a href="#detailpage{!product.Id}">
+         <apex:outputField value="{!product.Name}"/>
+      </a>
+   </li>
+ </apex:repeat>
+            </ul>
+            </div>
+         </div>
+      </div> 
+      <!-- Detail page, to display details when user clicks specific Merchandise record -->
+<!-- set up local variable -->
+<apex:repeat value="{!products}" var="product">
+   <div data-role="page" data-theme="b" id="detailpage{!product.Id}">
+      <!-- page header -->
+      <div data-role="header">
+         <!-- button for going back to mainpage -->
+         <a href='#mainpage' id="backInventory" class='ui-btn-left' data-icon='home'>
+            Home
+         </a>
+       <!-- page title -->
+     <h1>Edit</h1>
+   </div>
+   <!-- page content -->
+   <div id="#content" data-role="content">
+      <h2 id="name">
+         <apex:outputField value="{!product.Name}"/>
+      </h2>
+      <label for="price" class="ui-hidden-accessible">Price ($):</label>
+      <apex:outputField value="{!product.Price__c}"/>
+      <br/>
+      <label for="quantity" class="ui-hidden-accessible">Quantity:</label>
+      <input type="text" id="quantity{!product.Id}" value="{!ROUND(product.Quantity__c,
+          0)}"></input>
+      <br/>
+      <a href="#" data-role="button" data-id="{!product.Id}" class="updateButton" datatheme="
+          b">Update</a>
+      </div>
+   </div>
+</apex:repeat>
+  </body>
+ </apex:page>

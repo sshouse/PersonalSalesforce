@@ -1,0 +1,42 @@
+<apex:page standardController="LicensingPlus__License__c" extensions="LicensingPlus.LicenseController">
+    <apex:form >
+        <apex:sectionHeader title="License" subtitle="{!IF(ISBLANK(LicensingPlus__License__c.Id), 'New License', LicensingPlus__License__c.Name)}" /> 
+        <div class="bPageTitle"><div class="ptBreadcrumb">&nbsp;«&nbsp;<apex:commandLink action="{!viewList}" value="Back to List: Insurance Licenses" /></div></div>
+        <apex:pageMessages />
+        <apex:pageBlock mode="maindetail" title="License Detail">
+            <apex:pageBlockButtons >
+                <apex:commandButton rendered="{!OR(isAdmin, AND($User.Id = LicensingPlus__License__c.OwnerId, NOT(locked)))}" action="{!edit}" value="Edit" />
+                <apex:commandButton rendered="{!AND(NOT(locked), $User.Id = LicensingPlus__License__c.OwnerId)}" value="Submit for Approval" action="{!URLFOR($Action.licensingplus__License__c.Submit, licensingplus__License__c.Id)}" />
+                <apex:commandButton rendered="{!AND(locked, NOT(ISNULL(approver)))}" value="Approve / Reject" action="{!approveReject}" />
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Information" columns="1">
+                <apex:outputField value="{!LicensingPlus__License__c.Name}" />
+                <apex:outputField value="{!LicensingPlus__License__c.RecordTypeId}" />
+                <apex:outputField value="{!LicensingPlus__License__c.LicensingPlus__State__c}" />
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Lines of Authority" />
+                    <apex:outputPanel >
+                        <apex:outputText value="{!loaTypes}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:outputField value="{!LicensingPlus__License__c.LicensingPlus__Class__c}" />
+                <apex:outputField value="{!LicensingPlus__License__c.LicensingPlus__Number__c}" />
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Insurance License as PDF" />
+                    <apex:outputPanel >
+                        <apex:outputLink rendered="{!NOT(ISNULL(licensePDF.Id))}" value="{!URLFOR($Action.Attachment.Download, licensePDF.Id)}" target="_blank">{!licensePDF.Name}</apex:outputLink>            
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:outputField value="{!LicensingPlus__License__c.LicensingPlus__NPN_Number__c}" rendered="{!recordTypeName = 'Resident_State'}" />
+                <apex:outputField value="{!LicensingPlus__License__c.LicensingPlus__Effective_Date__c}" />
+                <apex:outputField value="{!LicensingPlus__License__c.LicensingPlus__Expiration_Date__c}" />
+                <apex:outputField value="{!LicensingPlus__License__c.LicensingPlus__Status__c}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Custom License Fields" columns="1" rendered="{!!customLicenseFieldsEmpty}">
+            	<apex:repeat value="{!$ObjectType.LicensingPlus__License__c.FieldSets.LicensingPlus__Custom_License_Fields}"  var="field">
+              		<apex:outputField value="{!LicensingPlus__License__c[field.fieldPath]}" />
+           		</apex:repeat>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,36 @@
+<apex:page standardController="LicensingPlus__License__c" recordSetVar="licenses" extensions="LicensingPlus.LicenseSetController">
+    <apex:pageMessages />    
+    <apex:form rendered="{!NOT(hasPageErrors)}">
+        <apex:sectionHeader title="Licenses" />        
+        <apex:pageBlock title="Licenses" >
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton action="{!URLFOR($Action.licensingplus__License__c.New, null)}" value="New" />
+            </apex:pageBlockButtons>                        
+            <apex:pageBlockTable value="{!insuranceLicenses}" var="license" rendered="{!insuranceLicenses.size > 0}">
+                <apex:column >
+                    <apex:facet name="header">State</apex:facet>
+                    <apex:outputLink value="/{!license.license.Id}">{!license.license.LicensingPlus__State__c}</apex:outputLink>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">License Status</apex:facet>
+                    <apex:outputLink value="/{!license.license.Id}">{!license.license.LicensingPlus__Status__c}</apex:outputLink>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">License Type</apex:facet>
+                    <apex:outputField value="{!license.license.RecordType.Name}" />
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">Lines of Authority</apex:facet>
+                    <apex:outputText value="{!license.loaTypes}"/>
+                </apex:column>
+                <apex:repeat value="{!$ObjectType.LicensingPlus__License__c.FieldSets.LicensingPlus__Custom_License_Fields}"  var="field">
+              		<apex:column >
+              			<apex:facet name="header">{!field.label}</apex:facet>
+              			<apex:outputField value="{!license.license[field.fieldPath]}" />
+              		</apex:column>            		
+           		</apex:repeat>
+            </apex:pageBlockTable>
+            <apex:outputText value="You have no licenses." rendered="{!insuranceLicenses.size = 0}" />
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>
